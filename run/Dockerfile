@@ -1,0 +1,22 @@
+from alpine:3.9.3
+RUN apk add jq
+RUN apk add curl
+RUN apk add libjpeg libpng
+RUN apk add python3
+RUN apk add bash
+RUN apk add supervisor
+RUN apk add vim
+RUN apk add tar
+ADD build.tar /
+COPY eva-dist.tgz /opt/
+RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva-shell
+RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva
+# copy scripts and configs
+COPY eva-supervisor-install /
+COPY eva-supervisor-install.conf /etc/supervisor/conf.d/eva-install.conf
+COPY eva-dist.tgz /opt/
+COPY supervisord.conf /etc/supervisor/
+RUN chmod +x /eva-supervisor-install
+RUN mkdir /var/log/supervisor
+EXPOSE 162/udp 8881/udp 8812 8813 8817 8818 8828 8829
+CMD [ "/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf" ]
