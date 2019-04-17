@@ -1,2 +1,2 @@
 all:
-	docker build -t altertech/eva-min .
+	docker build -t altertech/eva-ics .
