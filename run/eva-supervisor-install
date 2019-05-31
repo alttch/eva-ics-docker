@@ -78,7 +78,7 @@ while [ 1 ]; do
       supervisorctl update
       break
   else
-      echo "SETUP FAILED. CODE: ${result}"
+      echo "FAILED. CODE: ${result}"
       exit 5
   fi
 done
