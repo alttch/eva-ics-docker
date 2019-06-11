@@ -8,6 +8,7 @@ RUN apk add bash
 RUN apk add libc-dev
 RUN apk add libffi-dev
 RUN apk add openssl-dev
+RUN apk add freetype-dev
 RUN apk add make
 COPY owfs-builder.sh /opt
 RUN /opt/owfs-builder.sh

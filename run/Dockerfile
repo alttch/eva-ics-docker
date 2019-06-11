@@ -1,7 +1,7 @@
 from alpine:3.9.3
 RUN apk add jq
 RUN apk add curl
-RUN apk add libjpeg libpng
+RUN apk add libjpeg libpng freetype
 RUN apk add python3
 RUN apk add bash
 RUN apk add supervisor
