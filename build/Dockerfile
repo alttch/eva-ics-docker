@@ -2,6 +2,7 @@ from alpine:3.9.3
 RUN apk add jq
 RUN apk add curl
 RUN apk add gcc
+RUN apk add g++
 RUN apk add libjpeg jpeg-dev libjpeg-turbo-dev libpng-dev
 RUN apk add python3 python3-dev
 RUN apk add bash
@@ -20,4 +21,4 @@ RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 RUN apk add musl-dev
 RUN apk add g++
 RUN /opt/eva/install/build-venv /
-RUN tar cvf build.tar /python3 /usr/lib/libow*
+RUN tar cvf build.tar /python3 /usr/lib/libow* /usr/lib/libstdc* /usr/lib/libgcc_s*
