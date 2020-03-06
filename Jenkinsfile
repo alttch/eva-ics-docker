@@ -8,7 +8,6 @@ pipeline {
       steps {
         script {
           sh "./download.sh"
-          evaInfo = new File('eva_build').text
           sh "cd build && make"
           sh "cd run && docker build -t ${imageName}:`cat ../eva_info`-${BUILD_NUMBER} ."
         }}
