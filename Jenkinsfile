@@ -8,15 +8,16 @@ pipeline {
       steps {
         script {
           sh "./download.sh"
+          evaInfo = new File('eva_build').text
           sh "cd build && make"
-          sh "cd run && docker build -t ${imageName}:${BUILD_NUMBER} ."
+          sh "cd run && docker build -t ${imageName}:${evaInfo}-${BUILD_NUMBER} ."
         }}
     }
     stage('pub') {
       steps {
         script {
-          sh "docker tag ${imageName}:${BUILD_NUMBER} ${imageName}:latest"
-          sh "docker push ${imageName}:${BUILD_NUMBER}"
+          sh "docker tag ${imageName}:${evaInfo}-${BUILD_NUMBER} ${imageName}:latest"
+          sh "docker push ${imageName}:${evaInfo}-${BUILD_NUMBER}"
           sh "docker push ${imageName}:latest"
         }
       }
@@ -24,7 +25,7 @@ pipeline {
   }
   post {
     always {
-        sh "docker rmi ${imageName}:${BUILD_NUMBER}"
+        sh "docker rmi ${imageName}:${evaInfo}-${BUILD_NUMBER}"
         sh "docker rmi ${imageName}:latest"
         }
     success { sh 'job-notify ok' }
