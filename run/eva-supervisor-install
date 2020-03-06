@@ -20,6 +20,16 @@ while [ 1 ]; do
       sleep 5
       continue
   fi
+  result=0
+  if [ $before_install ]; then
+    $before_install
+    result=$?
+  fi
+  if [ $result -ne 0 ]; then
+      echo "Unable to run before install command ${before_install}. Will try again in 5 seconds..."
+      sleep 5
+      continue
+  fi
   find . -maxdepth 1 -type d -name "eva-*" -exec mv -f {} eva \;
   # connect runtime volume if exists
   [ -d /runtime ] && ln -sf /runtime /opt/eva/runtime
@@ -71,6 +81,10 @@ while [ 1 ]; do
     ${AUTO_OPTS} ${MQTT_A_OPTS} ${MQTT_D_OPTS} ${MQTT_OPTS} ${mqtt} \
     ${LINK_OPTS} ${P_OPTS} ${CM_OPTS} ${DEPLOY_OPTS} ${deploy}
   result=$?
+  if [ $result -eq 0 ] && [ $after_install ]; then
+    $after_install
+    result=$?
+  fi
   if [ ${result} -eq 0 ]; then
       # create install flag
       touch /.installed
