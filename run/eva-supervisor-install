@@ -65,6 +65,7 @@ while [ 1 ]; do
   if [ "${product}" ]; then
     P_OPTS=
     for p in ${product}; do
+      p="$(echo $p | tr -d "\'\"")"
       P_OPTS="${P_OPTS} -p $p"
     done
   else
