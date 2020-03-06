@@ -7,8 +7,8 @@ pipeline {
     stage('build') {
       steps {
         script {
-          sh "cd build && make"
           sh "./download.sh"
+          sh "cd build && make"
           sh "cd run && make"
         }}
     }
