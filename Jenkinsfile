@@ -9,7 +9,7 @@ pipeline {
         script {
           sh "./download.sh"
           sh "cd build && make"
-          sh "cd run && make"
+          sh "cd run && docker build -t ${imageName}:${BUILD_NUMBER} ."
         }}
     }
     stage('pub') {
