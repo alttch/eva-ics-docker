@@ -74,7 +74,7 @@ while [ 1 ]; do
   # link to python venv
   ln -sf /python3
   # move venv config
-  mv -f /etc/venv ./etc/
+  [ -f /etc/venv ] && mv -f /etc/venv ./etc/
   # clean some old configs
   rm -rf runtime/*_notify.d runtime/*_remote_*.d
   bash ${bash_debug_opts} ./easy-setup --skip-check --auto --supervisor \
