@@ -75,7 +75,12 @@ while [ 1 ]; do
   # link to python venv
   ln -sf /python3
   # move venv config
-  [ -f /etc/venv ] && mv -f /etc/venv ./etc/
+  if [ -f /etc/venv ]; then
+    mv -f /etc/venv ./etc/
+  else
+    echo "SYSTEM_SITE_PACKAGES=1" > ./etc/venv
+    echo "SKIP=\"pandas\"" >> ./etc/venv
+  fi
   # clean some old configs
   rm -rf runtime/*_notify.d runtime/*_remote_*.d
   bash ${bash_debug_opts} ./easy-setup --skip-check --auto --supervisor \

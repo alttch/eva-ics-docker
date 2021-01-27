@@ -1,4 +1,4 @@
-from alpine:3.9.3
+from alpine:3.13.0
 RUN apk add jq
 RUN apk add curl
 RUN apk add gcc
@@ -11,12 +11,12 @@ RUN apk add libffi-dev
 RUN apk add openssl-dev
 RUN apk add freetype-dev
 RUN apk add make
+RUN apk add py3-pandas
 COPY owfs-builder.sh /opt
 RUN /opt/owfs-builder.sh
 COPY eva-dist.tgz /opt/
 COPY venv-builder.sh /opt
 RUN /opt/venv-builder.sh
-RUN rm -f /etc/venv
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 RUN apk add musl-dev
 RUN apk add g++
