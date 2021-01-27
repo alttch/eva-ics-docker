@@ -12,8 +12,8 @@ RUN apk add openssl-dev
 RUN apk add freetype-dev
 RUN apk add make
 RUN apk add py3-pandas
-COPY owfs-builder.sh /opt
-RUN /opt/owfs-builder.sh
+#COPY owfs-builder.sh /opt
+#RUN /opt/owfs-builder.sh
 COPY eva-dist.tgz /opt/
 COPY venv-builder.sh /opt
 RUN /opt/venv-builder.sh
@@ -21,4 +21,5 @@ RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 RUN apk add musl-dev
 RUN apk add g++
 RUN /opt/eva/install/build-venv /
-RUN tar cvf build.tar /python3 /usr/lib/libow* /usr/lib/libstdc* /usr/lib/libgcc_s*
+RUN tar cvf build.tar /python3 /usr/lib/libstdc* /usr/lib/libgcc_s*
+#/usr/lib/libow* 
