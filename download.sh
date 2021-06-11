@@ -2,7 +2,7 @@
 
 REPO=https://get.eva-ics.com
 
-if [ "x$1" = "x--test" ]; then
+if [ "$1" = "--test" ]; then
   REPO=https://test.eva-ics.com
 fi
 
