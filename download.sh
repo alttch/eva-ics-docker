@@ -1,8 +1,8 @@
-#!/bin/sh -e
+#!/bin/bash -e
 
 REPO=https://get.eva-ics.com
 
-if [ "x$1" = "x--test" ]; then
+if [ "$1" = "--test" ]; then
   REPO=https://test.eva-ics.com
 fi
 
@@ -16,3 +16,11 @@ rm -f run/eva-dist.tgz
 
 wget ${REPO}/${VER}/nightly/eva-${VER}-${BUILD}.tgz -O build/eva-dist.tgz
 cp -vf build/eva-dist.tgz run/
+
+source <(tar xvf build/eva-dist.tgz --wildcards "eva-*/lib/eva/registry/info" -O)
+
+if [ -z "$YEDB_VERSION" ]; then
+  echo "Unable to get YEDB version"
+fi
+
+wget ${REPO}/yedb/yedb-${YEDB_VERSION}-x86_64-musl.tar.gz -O run/yedb.tgz
