@@ -6,12 +6,16 @@ while [ 1 ]; do
   # download EVA ICS
   if [ ${download} ]; then
       rm -f eva-dist.tgz
+      rm -f yedb.tgz
       curl ${download} -o eva-dist.tgz
       if [ $? -ne 0 ]; then
           echo "Unable to connect to EVA ICS repository. Will try again in 5 seconds..."
           sleep 5
           continue
       fi
+    YEDB_TB=
+  else
+    YEDB_TB=/opt/yedb.tgz
   fi
   find . -maxdepth 1 -type d -name "eva*" -exec rm -rf {} \;
   tar xzf eva-dist.tgz
@@ -74,16 +78,8 @@ while [ 1 ]; do
   cd /opt/eva
   # link to python venv
   ln -sf /python3
-  # move venv config
-  if [ -f /etc/venv ]; then
-    mv -f /etc/venv ./etc/
-  else
-    echo "SYSTEM_SITE_PACKAGES=1" > ./etc/venv
-    echo "SKIP=\"pandas\"" >> ./etc/venv
-  fi
-  # clean some old configs
-  rm -rf runtime/*_notify.d runtime/*_remote_*.d
-  bash ${bash_debug_opts} ./easy-setup --skip-check --auto --supervisor \
+  YEDB_TARBALL_PATH=$YEDB_TB VENV_CONFIG=./etc/setup/venv-system-pandas.yml \
+    bash ${bash_debug_opts} ./easy-setup --skip-check --auto \
     ${AUTO_OPTS} ${MQTT_A_OPTS} ${MQTT_D_OPTS} ${MQTT_OPTS} ${mqtt} \
     ${LINK_OPTS} ${P_OPTS} ${CM_OPTS} ${DEPLOY_OPTS} ${deploy}
   result=$?
@@ -92,9 +88,21 @@ while [ 1 ]; do
     result=$?
   fi
   if [ ${result} -eq 0 ]; then
-      # create install flag
       touch /.installed
+      if [ -z "$product" ] || [ "$product" == "all" ]; then
+        product="uc lm sfa"
+      fi
+      /opt/eva/sbin/eva-control stop
+      for p in $product; do
+        cp ./etc/supervisor/conf.d/eva-${p}.conf /etc/supervisor/conf.d/
+        AUTO_PREFIX=1 /opt/eva/sbin/eva-registry-cli set-field \
+          config/${p}/service supervisord-program eva-${p}
+      done
+      /opt/eva/sbin/registry-control stop
+      echo YEDB_SUPERVISORD_PROGRAM=eva-registry >> /opt/eva/etc/eva_config
       rm -f /etc/supervisor/conf.d/eva-install.conf
+      cp ./etc/supervisor/conf.d/eva-registry.conf /etc/supervisor/conf.d/
+      cp ./etc/supervisor/conf.d/eva-onboot.conf /etc/supervisor/conf.d/
       supervisorctl update
       break
   else
