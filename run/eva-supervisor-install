@@ -94,6 +94,7 @@ while [ 1 ]; do
       fi
       /opt/eva/sbin/eva-control stop
       for p in $product; do
+        p=$(echo $p|tr -d '"'|tr -d "'")
         cp ./etc/supervisor/conf.d/eva-${p}.conf /etc/supervisor/conf.d/
         AUTO_PREFIX=1 /opt/eva/sbin/eva-registry-cli set-field \
           config/${p}/service supervisord-program eva-${p}
