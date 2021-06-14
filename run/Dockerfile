@@ -10,8 +10,10 @@ RUN apk add tar
 RUN ln -sf /usr/bin/python3 /usr/bin/python
 ADD build.tar /
 COPY eva-dist.tgz /opt/
+COPY yedb.tgz /opt/
 RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva-shell
 RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva
+RUN ln -sf /opt/eva/bin/eva-registry /usr/local/bin/eva-registry
 # copy scripts and configs
 COPY eva-supervisor-install /
 COPY eva-supervisor-install.conf /etc/supervisor/conf.d/eva-install.conf
