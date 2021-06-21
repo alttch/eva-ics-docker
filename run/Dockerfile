@@ -1,4 +1,4 @@
-from alpine:3.13.0
+from alpine:3.14.0
 RUN apk add jq
 RUN apk add curl
 RUN apk add libjpeg libpng freetype
