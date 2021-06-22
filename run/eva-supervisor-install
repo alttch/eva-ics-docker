@@ -77,7 +77,7 @@ while [ 1 ]; do
   fi
   cd /opt/eva
   # link to python venv
-  ln -sf /python3
+  ln -sf /venv
   YEDB_TARBALL_PATH=$YEDB_TB VENV_CONFIG=./etc/setup/venv-system-pandas.yml \
     bash ${bash_debug_opts} ./easy-setup --skip-check --auto \
     ${AUTO_OPTS} ${MQTT_A_OPTS} ${MQTT_D_OPTS} ${MQTT_OPTS} ${mqtt} \
