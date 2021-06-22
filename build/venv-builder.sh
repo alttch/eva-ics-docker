@@ -2,7 +2,7 @@
 
 cd /opt
 
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh /dev/stdin -y
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh /dev/stdin -y -c rustc
 source $HOME/.cargo/env
 tar xzvf eva-dist.tgz || exit 1
 find . -type d -name "eva*" -maxdepth 1 -exec mv -f {} eva \;
