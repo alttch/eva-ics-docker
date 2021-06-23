@@ -1,7 +1,20 @@
 #!/bin/bash
 
-[ -f /.installed  ] && exit 0
+STDOUT=/dev/fd/1
+STDERR=/dev/fd/2
+
+export STDOUT STDERR
+
 while [ 1 ]; do
+  if [ -f /.installed ]; then
+    break
+  fi
+  if [ -z "$product" ] || [ "$product" == "all" ]; then
+    PRODUCTS="uc lm sfa"
+  else
+    PRODUCTS=$product
+  fi
+  export PRODUCTS
   cd /opt
   # download EVA ICS
   if [ ${download} ]; then
@@ -36,25 +49,26 @@ while [ 1 ]; do
   fi
   find . -maxdepth 1 -type d -name "eva-*" -exec mv -f {} eva \;
   # connect runtime volume if exists
-  [ -d /runtime ] && ln -sf /runtime /opt/eva/runtime
-  # turn on debug mode
-  bash_debug_opts=
-  if [ ${debug} ] || [ ${development_mode} ]; then
-      [ ${development_mode} ] && devmode='\ndevelopment = yes' || devmode=
-      sed -i "s/^debug =.*/debug = yes${devmode}/g" eva/etc/*.ini-dist
-      bash_debug_opts=-x
-  fi
-  # connect ui volume if exists
-  if [ -d /ui ]; then
+  [ -d /mnt/runtime ] && ln -sf /mnt/runtime /opt/eva/runtime
+  [ -d /mnt/log ] && ln -sf /mnt/log /opt/eva/log
+  [ -d /mnt/backup ] && ln -sf /mnt/backup /opt/eva/backup
+  # connect ui and pvt volumes if exist
+  if [ -d /mnt/ui ]; then
       if [ -z "$(ls -A /ui)" ]; then
           # empty ui, putting default
-          mv /opt/eva/ui/* /ui/
+          mv /opt/eva/ui/* /mnt/ui/
       fi
       rm -rf /opt/eva/ui
-      ln -sf /ui /opt/eva/ui
+      ln -sf /mnt/ui /opt/eva/ui
   fi
-  # connect backup volume if exists
-  [ -d /backup ] && ln -sf /backup /opt/eva/backup
+  if [ -d /mnt/pvt ]; then
+      if [ -z "$(ls -A /pvt)" ]; then
+          # empty pvt, putting default
+          mv /opt/eva/pvt/* /mnt/pvt/
+      fi
+      rm -rf /opt/eva/pvt
+      ln -sf /mnt/pvt /opt/eva/pvt
+  fi
   # setup EVA ICS
   MQTT_OPTS=
   MQTT_A_OPTS=
@@ -62,7 +76,6 @@ while [ 1 ]; do
   LINK_OPTS=
   CM_OPTS=
   DEPLOY_OPTS=
-  [ "x${link}" = "x1" ] && LINK_OPTS="--link"
   [ "x${cloud_manager}" = "x1" ] && CM_OPTS="--cloud-manager"
   [ "x${deploy}" != "x" ] && DEPLOY_OPTS="--deploy"
   [ ${mqtt} ] && MQTT_OPTS="--mqtt" && MQTT_A_OPTS=--mqtt-announce && MQTT_D_OPTS=--mqtt-discovery
@@ -79,9 +92,10 @@ while [ 1 ]; do
   # link to python venv
   ln -sf /venv
   YEDB_TARBALL_PATH=$YEDB_TB VENV_CONFIG=./etc/setup/venv-system-pandas.yml \
-    bash ${bash_debug_opts} ./easy-setup --skip-check --auto \
-    ${AUTO_OPTS} ${MQTT_A_OPTS} ${MQTT_D_OPTS} ${MQTT_OPTS} ${mqtt} \
-    ${LINK_OPTS} ${P_OPTS} ${CM_OPTS} ${DEPLOY_OPTS} ${deploy}
+    PREPARE_REGISTRY_SCRIPT=/eva-registry-setup \
+    bash ${bash_debug_opts} ./easy-setup --skip-check --auto --link \
+    ${MQTT_A_OPTS} ${MQTT_D_OPTS} ${MQTT_OPTS} ${mqtt} \
+    ${P_OPTS} ${CM_OPTS} ${DEPLOY_OPTS} ${deploy}
   result=$?
   if [ $result -eq 0 ] && [ $after_install ]; then
     $after_install
@@ -89,22 +103,6 @@ while [ 1 ]; do
   fi
   if [ ${result} -eq 0 ]; then
       touch /.installed
-      if [ -z "$product" ] || [ "$product" == "all" ]; then
-        product="uc lm sfa"
-      fi
-      /opt/eva/sbin/eva-control stop
-      for p in $product; do
-        p=$(echo $p|tr -d '"'|tr -d "'")
-        cp ./etc/supervisor/conf.d/eva-${p}.conf /etc/supervisor/conf.d/
-        AUTO_PREFIX=1 /opt/eva/sbin/eva-registry-cli set-field \
-          config/${p}/service supervisord-program eva-${p}
-      done
-      /opt/eva/sbin/registry-control stop
-      echo YEDB_SUPERVISORD_PROGRAM=eva-registry >> /opt/eva/etc/eva_config
-      rm -f /etc/supervisor/conf.d/eva-install.conf
-      cp ./etc/supervisor/conf.d/eva-registry.conf /etc/supervisor/conf.d/
-      cp ./etc/supervisor/conf.d/eva-onboot.conf /etc/supervisor/conf.d/
-      supervisorctl update
       break
   else
       echo "FAILED. CODE: ${result}"
@@ -112,5 +110,10 @@ while [ 1 ]; do
   fi
 done
 
-rm -f $0
+/opt/eva/sbin/registry-control start
+/opt/eva/sbin/eva-control start
+
+while true; do
+  sleep 1
+done
 exit 0
