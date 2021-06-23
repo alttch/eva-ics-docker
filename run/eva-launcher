@@ -54,7 +54,9 @@ if [ ! -f /.setup_completed ]; then
     [ -z "$MASTERKEY" ] && MASTERKEY=$( (tr -cd '[:alnum:]' < /dev/urandom | head -c64) 2>/dev/null)
     [ -z "$DEFAULTKEY" ] && DEFAULTKEY=$( (tr -cd '[:alnum:]' < /dev/urandom | head -c64) 2>/dev/null)
     ./bin/eva masterkey set "${MASTERKEY}" > /dev/null || exit 1
-    # TODO set default key
+    for c in uc lm sfa; do
+      ./sbin/apikey-set $c default "${DEFAULTKEY}" || exit 1
+    done
   fi
 fi
 
