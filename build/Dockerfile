@@ -1,25 +1,21 @@
 from alpine:3.14.0
 RUN apk add jq
 RUN apk add curl
-RUN apk add gcc
-RUN apk add g++
-RUN apk add libjpeg jpeg-dev libjpeg-turbo-dev libpng-dev
-RUN apk add python3 python3-dev
+RUN apk add libjpeg libpng freetype
+RUN apk add python3
 RUN apk add bash
-RUN apk add libc-dev
-RUN apk add libffi-dev
-RUN apk add openssl-dev
-RUN apk add freetype-dev
-RUN apk add make
-RUN apk add py3-pandas
-#COPY owfs-builder.sh /opt
-#RUN /opt/owfs-builder.sh
-COPY eva-dist.tgz /opt/
-COPY venv-builder.sh /opt
-RUN /opt/venv-builder.sh
+RUN apk add vim
+RUN apk add tar
+RUN apk add libffi
+# MSAD
+RUN apk add libldap libsasl libltdl libuuid
+# NET SNMP
+RUN apk add net-snmp-libs net-snmp-agent-libs
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
-RUN apk add musl-dev
-RUN apk add g++
-RUN /opt/eva/install/build-venv /
-RUN tar cvf build.tar /venv /usr/lib/libstdc* /usr/lib/libgcc_s*
-#/usr/lib/libow* 
+ADD lib.tar.gz /
+ADD libow.tar.gz /
+COPY eva-dist.tgz /opt/
+COPY ./venv.yml /
+ADD ./setup.sh /
+RUN sh -x ./setup.sh
+RUN tar cvf eva.tar /opt/eva

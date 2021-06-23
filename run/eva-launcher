@@ -1,0 +1,87 @@
+#!/bin/bash
+
+STDOUT=/dev/fd/1
+STDERR=/dev/fd/2
+
+export STDOUT STDERR
+
+ACTIVE=1
+
+_term() { 
+    if [ "$ACTIVE" = "1" ]; then
+      ACTIVE=
+      echo "Caught SIGTERM signal. Stopping everything" 
+      /opt/eva/sbin/eva-control stop
+      /opt/eva/sbin/registry-control stop
+    fi
+    exit 0
+}
+
+trap _term SIGTERM
+
+SETUP_MODE=
+FIRST_RUN=
+
+cd /opt/eva || exit 1
+
+./sbin/registry-control start
+
+if [ ! -f /.setup_completed ]; then
+  SETUP_MODE=1
+  if [ -f /setup/prepare.sh ]; then
+    cd /setup || exit 1
+    /setup/prepare.sh || exit $?
+    cd /opt/eva || exit 1
+  fi
+  [ -d /mnt/log ] && rm -rf /opt/eva/log && ln -sf /mnt/log /opt/eva/log
+  [ -d /mnt/backup ] && rm -rf /opt/eva/backup && ln -sf /mnt/backup /opt/eva/backup
+  for vol in runtime ui pvt etc; do
+    if [ -d /mnt/${vol} ]; then
+      if [ -z "$(ls -A /mnt/${vol})" ]; then
+        # empty, putting defaults
+        mv /opt/eva/${vol}/* /mnt/${vol}/
+      fi
+      rm -rf /opt/eva/${vol}
+      ln -sf /mnt/${vol} /opt/eva/${vol}
+    fi
+  done
+  . ./etc/eva_config
+  if [ "$SYSTEM_NAME" = "eva_changeme" ]; then
+    SYSTEM_NAME=$(hostname)
+    FIRST_RUN=1
+    ./bin/eva feature setup node_name "name=${SYSTEM_NAME},rename_only=1" || exit 1
+    rm -f ./etc/eva_config-[0-9]*
+    [ -z "$MASTERKEY" ] && MASTERKEY=$( (tr -cd '[:alnum:]' < /dev/urandom | head -c64) 2>/dev/null)
+    [ -z "$DEFAULTKEY" ] && DEFAULTKEY=$( (tr -cd '[:alnum:]' < /dev/urandom | head -c64) 2>/dev/null)
+    ./bin/eva masterkey set "${MASTERKEY}" > /dev/null || exit 1
+    # TODO set default key
+  fi
+fi
+
+/opt/eva/sbin/eva-control start || exit 1
+
+if [ "$SETUP_MODE" = "1" ]; then
+  if [ -f /setup/setup.sh ]; then
+    cd /setup || exit 1
+    ./setup.sh || exit $?
+    cd /opt/eva || exit 1
+  fi
+  touch /.setup_completed
+  if [ "$FIRST_RUN" = "1" ]; then
+    echo
+    echo "Setup completed"
+    echo
+    echo "Master key: ${MASTERKEY}"
+    echo "Default key: ${DEFAULTKEY}"
+    echo
+    if [ "${DEPLOY}" ]; then
+      echo "Starting deployment of ${DEPLOY}..."
+      ./bin/eva sfa cloud deploy "${DEPLOY}" -s -y -c "srv=${SYSTEM_NAME}"
+    fi
+  fi
+fi
+
+while [ "${ACTIVE}" = "1" ]; do
+  sleep 1
+done
+exit 0

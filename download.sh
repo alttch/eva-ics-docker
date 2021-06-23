@@ -14,13 +14,14 @@ echo -n ${VER}-${BUILD} > eva_build
 rm -f build/eva-dist.tgz
 rm -f run/eva-dist.tgz
 
-wget ${REPO}/${VER}/nightly/eva-${VER}-${BUILD}.tgz -O build/eva-dist.tgz
-cp -vf build/eva-dist.tgz run/
+wget ${REPO}/${VER}/nightly/eva-${VER}-${BUILD}.tgz -O eva-dist.tgz
 
-source <(tar xvf build/eva-dist.tgz --wildcards "eva-*/lib/eva/registry/info" -O)
+echo "Downloaded EVA ICS ${VER} ${BUILD}"
 
-if [ -z "$YEDB_VERSION" ]; then
-  echo "Unable to get YEDB version"
-fi
+#source <(tar xvf build/eva-dist.tgz --wildcards "eva-*/lib/eva/registry/info" -O)
 
-wget ${REPO}/yedb/yedb-${YEDB_VERSION}-x86_64-musl.tar.gz -O run/yedb.tgz
+#if [ -z "$YEDB_VERSION" ]; then
+  #echo "Unable to get YEDB version"
+#fi
+
+#wget ${REPO}/yedb/yedb-${YEDB_VERSION}-x86_64-musl.tar.gz -O run/yedb.tgz
