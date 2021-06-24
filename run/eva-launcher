@@ -57,6 +57,8 @@ if [ ! -f /.setup_completed ]; then
     for c in uc lm sfa; do
       ./sbin/apikey-set $c default "${DEFAULTKEY}" || exit 1
     done
+  else
+    ./bin/eva feature setup venv
   fi
 fi
 
