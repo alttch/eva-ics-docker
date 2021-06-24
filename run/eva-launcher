@@ -7,14 +7,14 @@ export STDOUT STDERR
 
 ACTIVE=1
 
-_term() { 
-    if [ "$ACTIVE" = "1" ]; then
-      ACTIVE=
-      echo "Caught SIGTERM signal. Stopping everything" 
-      /opt/eva/sbin/eva-control stop
-      /opt/eva/sbin/registry-control stop
-    fi
-    exit 0
+_term() {
+  if [ "$ACTIVE" = "1" ]; then
+    ACTIVE=
+    echo "Caught SIGTERM signal. Stopping everything"
+    /opt/eva/sbin/eva-control stop
+    /opt/eva/sbin/registry-control stop
+  fi
+  exit 0
 }
 
 trap _term SIGTERM
@@ -32,6 +32,10 @@ if [ ! -f /.setup_completed ]; then
     cd /setup || exit 1
     /setup/prepare.sh || exit $?
     cd /opt/eva || exit 1
+  fi
+  if [ -f /setup/rc.local ]; then
+    cp -vf /setup/rc.local /etc/
+    chmod +x /etc/rc.local
   fi
   [ -d /mnt/log ] && rm -rf /opt/eva/log && ln -sf /mnt/log /opt/eva/log
   [ -d /mnt/backup ] && rm -rf /opt/eva/backup && ln -sf /mnt/backup /opt/eva/backup
@@ -61,6 +65,8 @@ if [ ! -f /.setup_completed ]; then
     ./bin/eva feature setup venv
   fi
 fi
+
+[ -x /etc/rc.local ] && ./etc/rc.local
 
 /opt/eva/sbin/eva-control start || exit 1
 
