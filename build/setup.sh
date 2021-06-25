@@ -29,4 +29,5 @@ done
 ./sbin/registry-control stop || exit 1
 find ./runtime/registry -name "*.bak[0-9]*.jsonc" -exec rm -f {} \;
 rm -f ./easy-setup
+rm -rf ./doc
 exit 0
