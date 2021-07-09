@@ -18,7 +18,7 @@ The following volumes can be permanent (mounted from the host):
 * log
 * var
 
-The permanent volumes must be mounted to the container as /mnt/<VOL>
+The permanent volumes must be mounted to the container as /mnt/\<VOL\>
 
 ### Configuration variables
 
