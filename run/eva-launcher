@@ -24,21 +24,25 @@ FIRST_RUN=
 
 cd /opt/eva || exit 1
 
+
+[ -d /mnt/var ] && rm -rf /opt/eva/var && ln -sf /mnt/var /opt/eva/var
+
 ./sbin/registry-control start
 
 if [ ! -f /.setup_completed ]; then
   SETUP_MODE=1
   if [ -f /setup/prepare.sh ]; then
     cd /setup || exit 1
-    /setup/prepare.sh || exit $?
+    ./prepare.sh || exit $?
     cd /opt/eva || exit 1
   fi
   if [ -f /setup/rc.local ]; then
     cp -vf /setup/rc.local /etc/
     chmod +x /etc/rc.local
   fi
-  [ -d /mnt/log ] && rm -rf /opt/eva/log && ln -sf /mnt/log /opt/eva/log
-  [ -d /mnt/backup ] && rm -rf /opt/eva/backup && ln -sf /mnt/backup /opt/eva/backup
+  for vol in log backup; do
+    [ -d /mnt/${vol} ] && rm -rf /opt/eva/${vol} && ln -sf /mnt/${vol} /opt/eva/${vol}
+  done
   for vol in runtime ui pvt etc; do
     if [ -d /mnt/${vol} ]; then
       if [ -z "$(ls -A /mnt/${vol})" ]; then
