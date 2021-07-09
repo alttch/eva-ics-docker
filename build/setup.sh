@@ -8,7 +8,6 @@ echo "SYSTEM_NAME=eva_changeme" > ./etc/eva_config
 PIP_EXTRA_OPTIONS="-i https://pub.lab.altt.ch/mirror/pypi/musl-x86_64/local" \
   MASTERKEY=mchangeme DEFAULTKEY=dchangeme VENV_CONFIG=/venv.yml \
   bash -x ./easy-setup -p all --link --cloud-manager --auto || exit 1
-rm -f ./log/*
 
 ./sbin/eva-tinyapi -C sfa -F destroy_user u=operator || exit 1
 ./sbin/eva-tinyapi -C sfa -F destroy_key i=operator || exit 1
@@ -30,4 +29,5 @@ done
 find ./runtime/registry -name "*.bak[0-9]*.jsonc" -exec rm -f {} \;
 rm -f ./easy-setup
 rm -rf ./doc
+rm -f ./log/*
 exit 0
