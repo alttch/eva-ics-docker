@@ -30,4 +30,9 @@ find ./runtime/registry -name "*.bak[0-9]*.jsonc" -exec rm -f {} \;
 rm -f ./easy-setup
 rm -rf ./doc
 rm -f ./log/*
+rm -rf ./etc/bash_completion.d
+rm -rf ./etc/setup
+rm -rf ./etc/supervisor
+rm -rf ./etc/systemd
+rm -rf ./etc/zsh
 exit 0
