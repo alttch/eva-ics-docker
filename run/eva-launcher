@@ -68,9 +68,20 @@ if [ ! -f /.setup_completed ]; then
   else
     ./bin/eva feature setup venv
   fi
+  MY_BUILD=$(./sbin/eva-tinyapi -B)
+  source <(./sbin/key-as-source data/info)
+  [ -z "$MY_BUILD" ] && exit 12
+  [ -z "$BUILD" ] && exit 12
+  if [ "$MY_BUILD" -lt "$BUILD" ]; then
+    echo "FATAL. Container downgrade is not allowed"
+    exit 13
+  elif [ "$MY_BUILD" -gt "$BUILD" ]; then
+    ./update.sh || exit 13
+  fi
+  rm -f update.sh
 fi
 
-[ -x /etc/rc.local ] && ./etc/rc.local
+[ -x /etc/rc.local ] && /etc/rc.local
 
 /opt/eva/sbin/eva-control start || exit 1
 

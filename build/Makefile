@@ -1,5 +1,6 @@
 all:
 	cp ../eva-dist.tgz .
+	cp ../update-script .
 	mkdir -p b
 	docker build -t altertech/eva-ics-builder .
 	docker run -v `pwd`/b:/b altertech/eva-ics-builder cp /eva.tar /b/

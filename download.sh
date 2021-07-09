@@ -14,7 +14,8 @@ echo -n ${VER}-${BUILD} > eva_build
 rm -f build/eva-dist.tgz
 rm -f run/eva-dist.tgz
 
-wget ${REPO}/${VER}/nightly/eva-${VER}-${BUILD}.tgz -O eva-dist.tgz
+wget ${REPO}/${VER}/nightly/eva-${VER}-${BUILD}.tgz -O eva-dist.tgz || exit 1
+wget ${REPO}/${VER}/nightly/update-${BUILD}.sh -O update-script || exit 1
 
 echo "Downloaded EVA ICS ${VER} ${BUILD}"
 

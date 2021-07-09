@@ -18,4 +18,6 @@ COPY eva-dist.tgz /opt/
 COPY ./venv.yml /
 ADD ./setup.sh /
 RUN sh -x ./setup.sh
+COPY ./update-script /opt/eva/update.sh
+RUN chmod +x /opt/eva/update.sh
 RUN tar cvf eva.tar /opt/eva

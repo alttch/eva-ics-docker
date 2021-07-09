@@ -19,5 +19,7 @@ RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva-shell
 RUN ln -sf /opt/eva/bin/eva /usr/local/bin/eva
 RUN ln -sf /opt/eva/bin/eva-registry /usr/local/bin/eva-registry
 # copy scripts and configs
+COPY .eva_container /
 COPY eva-launcher /
+CMD echo "" > /.eva_container
 CMD [ "/bin/bash", "-c", "/eva-launcher" ]
