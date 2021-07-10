@@ -10,7 +10,7 @@ RUN apk add libffi
 # MSAD
 RUN apk add libldap libsasl libltdl libuuid
 # NET SNMP
-RUN apk add net-snmp-libs net-snmp-agent-libs
+RUN apk add net-snmp-libs net-snmp-agent-libs libpq
 RUN ln -s /usr/include/locale.h /usr/include/xlocale.h
 ADD lib.tar.gz /
 ADD libow.tar.gz /

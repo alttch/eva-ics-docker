@@ -11,7 +11,7 @@ RUN ln -sf /usr/bin/python3 /usr/bin/python
 # MSAD
 RUN apk add libldap libsasl libltdl libuuid
 # NET SNMP
-RUN apk add net-snmp-libs net-snmp-agent-libs
+RUN apk add net-snmp-libs net-snmp-agent-libs libpq
 ADD lib.tar.gz /
 ADD libow.tar.gz /
 ADD eva.tar /
