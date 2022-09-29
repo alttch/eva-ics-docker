@@ -1,13 +1,14 @@
 #!/bin/bash -e
 
-REPO=https://get.eva-ics.com
+REPO=https://pub.bma.ai/eva3
+INFO_FILE=update_info.json
 
 if [ "$1" = "--test" ]; then
-  REPO=https://test.eva-ics.com
+  INFO_FILE=update_info_test.json
 fi
 
-VER=`curl -sL ${REPO}/update_info.json|jq -r .version`
-BUILD=`curl -sL ${REPO}/update_info.json|jq -r .build`
+VER=`curl -sL ${REPO}/${INFO_FILE}|jq -r .version`
+BUILD=`curl -sL ${REPO}/${INFO_FILE}|jq -r .build`
 
 echo -n ${VER}-${BUILD} > eva_build
 
